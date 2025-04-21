@@ -8,13 +8,10 @@
 #include <errno.h>
 #include <pthread.h>
 
-#define SERV_PORT 9527
+#include "wrap.h"
 
-void sys_err(const char* str)
-{
-	perror(str);
-	exit(1);
-}
+
+#define SERV_PORT 9527
 
 int main(int argc, char* argv[])
 {
@@ -33,7 +30,7 @@ int main(int argc, char* argv[])
 	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 	// create socket
-	lfd = socket(AF_INET, SOCK_STREAM, 0);
+	lfd = Socket(AF_INET, SOCK_STREAM, 0);
 	if(lfd == 1){
 		sys_err("socket error");
 	}
