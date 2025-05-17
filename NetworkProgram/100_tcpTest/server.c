@@ -59,6 +59,9 @@ int main(int argc, char* argv[])
 
 		ret = read(cfd, buf, sizeof(buf));
 
+		if(ret == 0)
+			break;
+
 		write(STDOUT_FILENO, buf, ret);
 		
 		for(i = 0; i < ret; i++)
