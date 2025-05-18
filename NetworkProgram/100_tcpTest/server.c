@@ -31,47 +31,61 @@ int main(int argc, char* argv[])
 
 	// create socket
 	lfd = Socket(AF_INET, SOCK_STREAM, 0);
-	if(lfd == 1){
-		sys_err("socket error");
-	}
 
 	// bind
-	bind(lfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
+	 Bind(lfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
 
 	// listen
-	listen(lfd, 128);
+	Listen(lfd, 128);
 
 	clit_addr_len = sizeof(clit_addr);
 
 	// accept
-	cfd = accept(lfd, (struct sockaddr*)&clit_addr, &clit_addr_len);
+	while (1)
+	{
+		cfd = Accept(lfd, (struct sockaddr*)&clit_addr, &clit_addr_len);
 
-	if(cfd == 1)
-		sys_err("accept error");
+		// print client ip
+		printf("client ip:%s port:%d\n", 
+				inet_ntop(AF_INET, &clit_addr.sin_addr.s_addr, client_IP, sizeof(client_IP)), 
+				ntohs(clit_addr.sin_port));
 
-	// print client ip
-	printf("client ip:%s port:%d\n", 
-			inet_ntop(AF_INET, &clit_addr.sin_addr.s_addr, client_IP, sizeof(client_IP)), 
-			ntohs(clit_addr.sin_port));
-
-	// read and write
-	while(1){
-
-		ret = read(cfd, buf, sizeof(buf));
-
-		if(ret == 0)
-			break;
-
-		write(STDOUT_FILENO, buf, ret);
+		int need_quit = 0;
 		
-		for(i = 0; i < ret; i++)
-			buf[i] = toupper(buf[i]);
+		// read and write
+		while(1){
 
-		write(cfd, buf, ret);
+			ret = Read(cfd, buf, sizeof(buf));
+			if(ret == 0)
+			{
+				Close(cfd);
+				printf("client close!!!\n");
+				break;
+			}
+			
+			if(strncmp(buf, "quit\n", ret) == 0)
+			{
+				need_quit = 1;
+				printf("server close!!!\n");
+				break;
+			}
+
+			Write(STDOUT_FILENO, buf, ret);
+			
+			for(i = 0; i < ret; i++)
+				buf[i] = toupper(buf[i]);
+
+			Write(cfd, buf, ret);
+		}
+
+		if(need_quit == 1)
+		{
+			Close(cfd);
+			Close(lfd);
+			break;
+		}
+			
 	}
-
-	close(lfd);
-	close(cfd);
-
+	
 	return 0;
 }

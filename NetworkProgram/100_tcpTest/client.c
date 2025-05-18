@@ -10,7 +10,7 @@
 
 #define SERV_PORT 9527
 
-void sys_err(const char* str)
+void perr_exit(const char* str)
 {
 	perror(str);
 	exit(1);
@@ -30,14 +30,14 @@ int main(int argc, char* argv[])
 
 	cfd = socket(AF_INET, SOCK_STREAM, 0);
 	if(cfd == -1)
-		sys_err("socket error");
+		perr_exit("socket error");
 	
 	printf("socket ok\n");
 	
 	// connect
 	int ret = connect(cfd, (struct sockaddr*) &serv_addr, sizeof(serv_addr));
 	if(ret != 0)
-		sys_err("connect error");
+		perr_exit("connect error");
 	
 	printf("connect ok\n");
 	
