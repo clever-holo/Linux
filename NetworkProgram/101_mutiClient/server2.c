@@ -73,6 +73,8 @@ void *do_work(void *arg)
 	if(need_quit){
 		Close(cfd);
 	}
+
+	return (void*)0;
 }
 
 int main(int argc, char* argv[])
